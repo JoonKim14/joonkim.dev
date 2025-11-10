@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Globe from '../components/Globe';
+---
+
+<Layout title="Joon Kim - Developer">
+  <main class="min-h-screen">
+    <!-- Globe Section -->
+    <section class="relative h-screen flex items-center justify-center overflow-hidden">
+      <!-- Starfield Background -->
+      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-space-purple to-space-black"></div>
+
+      <!-- Globe Component (React Island) -->
+      <div class="relative z-10 w-full h-full">
+        <Globe client:load />
+      </div>
+    </section>
+    
+    <!-- Hero Text Section -->
+    <section class="relative pt-32 pb-12 px-8 bg-gradient-to-b from-space-black via-space-navy to-transparent">
+      <div class="text-center">
+        <h1 class="text-7xl font-bold mb-6 bg-gradient-to-r from-planet-green-light to-planet-blue-medium bg-clip-text text-transparent">
+          Joon Kim
+        </h1>
+        <p class="text-2xl text-gray-300 mb-8">
+          Welcome to my planet
+        </p>
+
+        <!-- Scroll Indicator -->
+        <div class="animate-bounce">
+          <svg class="w-8 h-8 text-planet-green-light mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- About Section (placeholder) -->
+    <section class="py-20 px-8 bg-gradient-to-b from-space-purple to-space-black">
+      <div class="max-w-4xl mx-auto text-center">
+        <h2 class="text-4xl font-bold mb-6 text-planet-green-light">About</h2>
+        <p class="text-lg text-gray-300 leading-relaxed">
+          This is my planet! A place of good vibes and growth.
+        </p>
+      </div>
+    </section>
+  </main>
+</Layout>
