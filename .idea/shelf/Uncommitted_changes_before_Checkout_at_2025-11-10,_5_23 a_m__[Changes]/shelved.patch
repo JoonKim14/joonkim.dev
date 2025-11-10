@@ -1,0 +1,206 @@
+Index: src/components/Globe.tsx
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import { useRef, useMemo } from 'react';\r\nimport { Canvas, useFrame } from '@react-three/fiber';\r\nimport { OrbitControls, Sphere, Cylinder } from '@react-three/drei';\r\nimport * as THREE from 'three';\r\n\r\n// Pin locations on the globe (lat, lon)\r\nconst pins = [\r\n  { name: 'Projects', color: '#74c69d', lat: 40, lon: -30, link: '#projects' },\r\n  { name: 'Blog', color: '#48cae4', lat: 20, lon: 60, link: '#blog' },\r\n  { name: 'About', color: '#fcbf49', lat: -20, lon: 120, link: '#about' },\r\n  { name: 'Bookshelf', color: '#90e0ef', lat: -40, lon: -90, link: '#bookshelf' },\r\n  { name: 'Contact', color: '#f77f00', lat: 60, lon: 150, link: '#contact' },\r\n];\r\n\r\n// Convert lat/lon to 3D coordinates on sphere\r\nfunction latLonToVector3(lat: number, lon: number, radius: number) {\r\n  const phi = (90 - lat) * (Math.PI / 180);\r\n  const theta = (lon + 180) * (Math.PI / 180);\r\n\r\n  return new THREE.Vector3(\r\n    -radius * Math.sin(phi) * Math.cos(theta),\r\n    radius * Math.cos(phi),\r\n    radius * Math.sin(phi) * Math.sin(theta)\r\n  );\r\n}\r\n\r\n// 3D Pin marker component with stem and top\r\nfunction Pin({ position, color, name }: { position: THREE.Vector3; color: string; name: string }) {\r\n  const groupRef = useRef<THREE.Group>(null);\r\n  const topRef = useRef<THREE.Mesh>(null);\r\n\r\n  // Pulse animation for the top sphere\r\n  useFrame((state) => {\r\n    if (topRef.current) {\r\n      const scale = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.15;\r\n      topRef.current.scale.set(scale, scale, scale);\r\n    }\r\n  });\r\n\r\n  // Calculate the direction from origin to position for stem orientation\r\n  const direction = position.clone().normalize();\r\n  const stemLength = 0.3;\r\n  const stemPosition = position.clone().add(direction.clone().multiplyScalar(stemLength / 2));\r\n\r\n  // Create a quaternion to rotate the cylinder to point outward\r\n  const quaternion = new THREE.Quaternion();\r\n  quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);\r\n\r\n  return (\r\n    <group ref={groupRef}>\r\n      {/* Pin stem */}\r\n      <mesh position={stemPosition} quaternion={quaternion}>\r\n        <cylinderGeometry args={[0.02, 0.02, stemLength, 8]} />\r\n        <meshStandardMaterial color={color} metalness={0.8} roughness={0.2} />\r\n      </mesh>\r\n\r\n      {/* Pin top (sphere) */}\r\n      <mesh\r\n        ref={topRef}\r\n        position={position.clone().add(direction.clone().multiplyScalar(stemLength))}\r\n      >\r\n        <sphereGeometry args={[0.08, 16, 16]} />\r\n        <meshStandardMaterial\r\n          color={color}\r\n          emissive={color}\r\n          emissiveIntensity={0.5}\r\n          metalness={0.3}\r\n          roughness={0.3}\r\n        />\r\n        {/* Glow effect */}\r\n        <pointLight color={color} intensity={3} distance={0.8} />\r\n      </mesh>\r\n    </group>\r\n  );\r\n}\r\n\r\n// Cloud patches - scattered chunky clouds\r\nfunction Clouds() {\r\n  const cloudsRef = useRef<THREE.Mesh>(null);\r\n\r\n  // Rotate clouds slowly\r\n  useFrame(() => {\r\n    if (cloudsRef.current) {\r\n      cloudsRef.current.rotation.y += 0.0003;\r\n    }\r\n  });\r\n\r\n  // Create chunky cloud material with scattered patches\r\n  const cloudMaterial = useMemo(() => {\r\n    return new THREE.ShaderMaterial({\r\n      transparent: true,\r\n      side: THREE.DoubleSide,\r\n      depthWrite: false,\r\n      uniforms: {\r\n        time: { value: 0 },\r\n      },\r\n      vertexShader: `\r\n        varying vec2 vUv;\r\n        varying vec3 vNormal;\r\n        varying vec3 vPosition;\r\n\r\n        void main() {\r\n          vUv = uv;\r\n          vNormal = normalize(normalMatrix * normal);\r\n          vPosition = position;\r\n          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\r\n        }\r\n      `,\r\n      fragmentShader: `\r\n        uniform float time;\r\n        varying vec2 vUv;\r\n        varying vec3 vNormal;\r\n        varying vec3 vPosition;\r\n\r\n        // Noise functions\r\n        float random(vec2 st) {\r\n          return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);\r\n        }\r\n\r\n        float noise(vec2 st) {\r\n          vec2 i = floor(st);\r\n          vec2 f = fract(st);\r\n          float a = random(i);\r\n          float b = random(i + vec2(1.0, 0.0));\r\n          float c = random(i + vec2(0.0, 1.0));\r\n          float d = random(i + vec2(1.0, 1.0));\r\n          vec2 u = f * f * (3.0 - 2.0 * f);\r\n          return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;\r\n        }\r\n\r\n        float fbm(vec2 st) {\r\n          float value = 0.0;\r\n          float amplitude = 0.5;\r\n          for (int i = 0; i < 3; i++) {\r\n            value += amplitude * noise(st);\r\n            st *= 2.0;\r\n            amplitude *= 0.5;\r\n          }\r\n          return value;\r\n        }\r\n\r\n        void main() {\r\n          // Create blocky, chunky cloud patches\r\n          float scale = 4.0;\r\n          vec2 pos = vUv * scale;\r\n\r\n          // Base cloud pattern\r\n          float clouds = fbm(pos);\r\n\r\n          // Make it blockier by quantizing (creates steps)\r\n          clouds = floor(clouds * 5.0) / 5.0;\r\n\r\n          // Lower threshold for more visible clouds\r\n          clouds = smoothstep(0.4, 0.6, clouds);\r\n\r\n          // Add larger blocky shapes\r\n          float blockSize = 0.6;\r\n          vec2 blockPos = floor(pos / blockSize) * blockSize;\r\n          float blocks = random(blockPos);\r\n          blocks = step(0.45, blocks); // More blocks have clouds (was 0.6)\r\n\r\n          // Combine with base clouds\r\n          clouds *= blocks;\r\n\r\n          // Make sure we have discrete patches\r\n          if (clouds < 0.2) {\r\n            clouds = 0.0;\r\n          } else {\r\n            clouds = 1.0; // Hard edge - either cloud or no cloud\r\n          }\r\n\r\n          // Lighting effect\r\n          vec3 lightDir = normalize(vec3(1.0, 0.5, 1.0));\r\n          float lighting = max(dot(vNormal, lightDir), 0.0) * 0.3 + 0.7;\r\n\r\n          // Slight shadow on bottom for 3D effect\r\n          float shadow = step(vNormal.z, -0.2) * 0.25;\r\n          lighting -= shadow;\r\n\r\n          // Fade at extreme viewing angles\r\n          float viewFade = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);\r\n          clouds *= (1.0 - viewFade * 0.6);\r\n\r\n          // Bright white puffy clouds\r\n          vec3 cloudColor = vec3(1.0, 1.0, 1.0) * lighting;\r\n          float alpha = clouds * 0.9;\r\n\r\n          gl_FragColor = vec4(cloudColor, alpha);\r\n        }\r\n      `,\r\n    });\r\n  }, []);\r\n\r\n  // Hover above surface\r\n  return (\r\n    <Sphere ref={cloudsRef} args={[2.08, 64, 64]} material={cloudMaterial} />\r\n  );\r\n}\r\n\r\n// Planet component with detailed terrain\r\nfunction Planet() {\r\n  const globeRef = useRef<THREE.Mesh>(null);\r\n\r\n  // Slow rotation\r\n  useFrame(() => {\r\n    if (globeRef.current) {\r\n      globeRef.current.rotation.y += 0.0005;\r\n    }\r\n  });\r\n\r\n  // Create realistic planet shader with terrain\r\n  const planetMaterial = useMemo(() => {\r\n    return new THREE.ShaderMaterial({\r\n      uniforms: {\r\n        time: { value: 0 },\r\n      },\r\n      vertexShader: `\r\n        varying vec2 vUv;\r\n        varying vec3 vNormal;\r\n        varying vec3 vPosition;\r\n\r\n        void main() {\r\n          vUv = uv;\r\n          vNormal = normalize(normalMatrix * normal);\r\n          vPosition = position;\r\n          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);\r\n        }\r\n      `,\r\n      fragmentShader: `\r\n        uniform float time;\r\n        varying vec2 vUv;\r\n        varying vec3 vNormal;\r\n        varying vec3 vPosition;\r\n\r\n        // Nature-inspired colors\r\n        vec3 deepOcean = vec3(0.0, 0.45, 0.65);    // #007399\r\n        vec3 shallowOcean = vec3(0.0, 0.71, 0.85); // #00b4d8\r\n        vec3 beach = vec3(0.93, 0.89, 0.71);        // #eee3b5\r\n        vec3 grassland = vec3(0.45, 0.73, 0.53);   // #74c69d\r\n        vec3 forest = vec3(0.25, 0.57, 0.44);      // #40916c\r\n        vec3 darkForest = vec3(0.18, 0.42, 0.31);  // #2d6a4f\r\n        vec3 mountain = vec3(0.35, 0.33, 0.31);    // #595550\r\n        vec3 snow = vec3(0.95, 0.95, 0.97);        // #f2f2f7\r\n\r\n        // Multi-octave noise\r\n        float random(vec2 st) {\r\n          return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);\r\n        }\r\n\r\n        float noise(vec2 st) {\r\n          vec2 i = floor(st);\r\n          vec2 f = fract(st);\r\n          float a = random(i);\r\n          float b = random(i + vec2(1.0, 0.0));\r\n          float c = random(i + vec2(0.0, 1.0));\r\n          float d = random(i + vec2(1.0, 1.0));\r\n          vec2 u = f * f * (3.0 - 2.0 * f);\r\n          return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;\r\n        }\r\n\r\n        float fbm(vec2 st) {\r\n          float value = 0.0;\r\n          float amplitude = 0.5;\r\n          for (int i = 0; i < 6; i++) {\r\n            value += amplitude * noise(st);\r\n            st *= 2.0;\r\n            amplitude *= 0.5;\r\n          }\r\n          return value;\r\n        }\r\n\r\n        void main() {\r\n          // Create elevation map\r\n          float elevation = fbm(vUv * 4.0);\r\n\r\n          // Add more detail at different scales\r\n          elevation += noise(vUv * 16.0) * 0.1;\r\n          elevation += noise(vUv * 32.0) * 0.05;\r\n\r\n          // Latitude affects temperature (affects colors)\r\n          float latitude = abs(vUv.y - 0.5) * 2.0;\r\n\r\n          vec3 color;\r\n\r\n          // Ocean\r\n          if (elevation < 0.45) {\r\n            color = mix(deepOcean, shallowOcean, elevation / 0.45);\r\n          }\r\n          // Beach\r\n          else if (elevation < 0.48) {\r\n            color = mix(shallowOcean, beach, (elevation - 0.45) / 0.03);\r\n          }\r\n          // Grassland\r\n          else if (elevation < 0.55) {\r\n            color = mix(beach, grassland, (elevation - 0.48) / 0.07);\r\n          }\r\n          // Forest\r\n          else if (elevation < 0.65) {\r\n            float forestMix = (elevation - 0.55) / 0.1;\r\n            color = mix(grassland, forest, forestMix);\r\n            // Add variation\r\n            color = mix(color, darkForest, noise(vUv * 20.0) * 0.3);\r\n          }\r\n          // Mountains\r\n          else if (elevation < 0.75) {\r\n            color = mix(forest, mountain, (elevation - 0.65) / 0.1);\r\n          }\r\n          // Snow peaks\r\n          else {\r\n            color = mix(mountain, snow, (elevation - 0.75) / 0.25);\r\n          }\r\n\r\n          // Polar ice caps\r\n          if (latitude > 0.85) {\r\n            color = mix(color, snow, (latitude - 0.85) / 0.15);\r\n          }\r\n\r\n          // Add subtle atmospheric glow\r\n          float fresnel = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 3.0);\r\n          vec3 glowColor = vec3(0.45, 0.83, 0.67);\r\n          color = mix(color, glowColor, fresnel * 0.2);\r\n\r\n          // Add slight ambient variation\r\n          color *= 0.9 + noise(vUv * 50.0) * 0.1;\r\n\r\n          gl_FragColor = vec4(color, 1.0);\r\n        }\r\n      `,\r\n    });\r\n  }, []);\r\n\r\n  // Update time uniform\r\n  useFrame((state) => {\r\n    if (globeRef.current && globeRef.current.material instanceof THREE.ShaderMaterial) {\r\n      globeRef.current.material.uniforms.time.value = state.clock.elapsedTime;\r\n    }\r\n  });\r\n\r\n  return (\r\n    <group>\r\n      {/* Main planet sphere with terrain */}\r\n      <Sphere ref={globeRef} args={[2, 128, 128]} material={planetMaterial} />\r\n\r\n      {/* Cloud layer */}\r\n      <Clouds />\r\n\r\n      {/* Pins */}\r\n      {pins.map((pin) => {\r\n        const position = latLonToVector3(pin.lat, pin.lon, 2.0);\r\n        return <Pin key={pin.name} position={position} color={pin.color} name={pin.name} />;\r\n      })}\r\n    </group>\r\n  );\r\n}\r\n\r\n// Enhanced starfield with more variety\r\nfunction Starfield() {\r\n  const starsRef = useRef<THREE.Points>(null);\r\n\r\n  // Generate stars with varying sizes\r\n  const { positions, sizes } = useMemo(() => {\r\n    const positions = new Float32Array(3000 * 3);\r\n    const sizes = new Float32Array(3000);\r\n\r\n    for (let i = 0; i < 3000; i++) {\r\n      const radius = 50 + Math.random() * 50;\r\n      const theta = Math.random() * Math.PI * 2;\r\n      const phi = Math.acos(2 * Math.random() - 1);\r\n\r\n      positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);\r\n      positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);\r\n      positions[i * 3 + 2] = radius * Math.cos(phi);\r\n\r\n      // Varying star sizes\r\n      sizes[i] = Math.random() * 0.08 + 0.02;\r\n    }\r\n    return { positions, sizes };\r\n  }, []);\r\n\r\n  // Subtle flicker\r\n  useFrame((state) => {\r\n    if (starsRef.current) {\r\n      const material = starsRef.current.material as THREE.PointsMaterial;\r\n      material.opacity = 0.7 + Math.sin(state.clock.elapsedTime * 0.5) * 0.3;\r\n    }\r\n  });\r\n\r\n  return (\r\n    <points ref={starsRef}>\r\n      <bufferGeometry>\r\n        <bufferAttribute\r\n          attach=\"attributes-position\"\r\n          count={positions.length / 3}\r\n          array={positions}\r\n          itemSize={3}\r\n        />\r\n        <bufferAttribute\r\n          attach=\"attributes-size\"\r\n          count={sizes.length}\r\n          array={sizes}\r\n          itemSize={1}\r\n        />\r\n      </bufferGeometry>\r\n      <pointsMaterial\r\n        color=\"#ffffff\"\r\n        transparent\r\n        opacity={1.0}\r\n        sizeAttenuation\r\n        vertexColors={false}\r\n      />\r\n    </points>\r\n  );\r\n}\r\n\r\n// Main Globe component\r\nexport default function Globe() {\r\n  return (\r\n    <div className=\"w-full h-full\">\r\n      <Canvas\r\n        camera={{ position: [0, 0, 6], fov: 45 }}\r\n        style={{ background: 'transparent' }}\r\n      >\r\n        {/* Enhanced lighting for realistic look */}\r\n        <ambientLight intensity={0.3} />\r\n        <directionalLight position={[5, 3, 5]} intensity={1.2} castShadow />\r\n        <pointLight position={[-5, 2, -3]} intensity={0.4} color=\"#48cae4\" />\r\n        <hemisphereLight args={['#ffffff', '#60a5fa', 0.4]} />\r\n\r\n        {/* Starfield */}\r\n        <Starfield />\r\n\r\n        {/* Planet with terrain and clouds */}\r\n        <Planet />\r\n\r\n        {/* Controls */}\r\n        <OrbitControls\r\n          enableZoom={false}\r\n          enablePan={false}\r\n          minPolarAngle={Math.PI / 3}\r\n          maxPolarAngle={Math.PI / 1.5}\r\n          autoRotate\r\n          autoRotateSpeed={0.3}\r\n        />\r\n      </Canvas>\r\n    </div>\r\n  );\r\n}\r\n
+===================================================================
+diff --git a/src/components/Globe.tsx b/src/components/Globe.tsx
+--- a/src/components/Globe.tsx	(revision f3b864868e7ef9a0447ced15407d073994f2f6c4)
++++ b/src/components/Globe.tsx	(date 1762770143814)
+@@ -74,126 +74,89 @@
+   );
+ }
+ 
+-// Cloud patches - scattered chunky clouds
++// Individual cloud mesh component
++function Cloud({ position }: { position: THREE.Vector3 }) {
++  const cloudRef = useRef<THREE.Group>(null);
++
++  // Subtle floating animation
++  useFrame((state) => {
++    if (cloudRef.current) {
++      cloudRef.current.position.y = position.y + Math.sin(state.clock.elapsedTime + position.x) * 0.01;
++    }
++  });
++
++  // Calculate direction for proper orientation
++  const direction = position.clone().normalize();
++  const quaternion = new THREE.Quaternion();
++  quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), direction);
++
++  return (
++    <group ref={cloudRef} position={position} quaternion={quaternion}>
++      {/* Main cloud body - made of multiple spheres for blocky/chunky look */}
++      {/* Center large sphere */}
++      <mesh position={[0, 0, 0]}>
++        <sphereGeometry args={[0.12, 8, 8]} />
++        <meshStandardMaterial color="#ffffff" roughness={0.8} metalness={0.1} />
++      </mesh>
++
++      {/* Side spheres for width */}
++      <mesh position={[0.08, 0, 0]}>
++        <sphereGeometry args={[0.09, 8, 8]} />
++        <meshStandardMaterial color="#ffffff" roughness={0.8} metalness={0.1} />
++      </mesh>
++      <mesh position={[-0.08, 0, 0]}>
++        <sphereGeometry args={[0.09, 8, 8]} />
++        <meshStandardMaterial color="#ffffff" roughness={0.8} metalness={0.1} />
++      </mesh>
++
++      {/* Top spheres for puffiness */}
++      <mesh position={[0.04, 0.08, 0]}>
++        <sphereGeometry args={[0.08, 8, 8]} />
++        <meshStandardMaterial color="#ffffff" roughness={0.8} metalness={0.1} />
++      </mesh>
++      <mesh position={[-0.04, 0.08, 0]}>
++        <sphereGeometry args={[0.07, 8, 8]} />
++        <meshStandardMaterial color="#ffffff" roughness={0.8} metalness={0.1} />
++      </mesh>
++    </group>
++  );
++}
++
++// Cloud collection - scattered around globe
+ function Clouds() {
+-  const cloudsRef = useRef<THREE.Mesh>(null);
++  const groupRef = useRef<THREE.Group>(null);
+ 
+-  // Rotate clouds slowly
++  // Slow rotation
+   useFrame(() => {
+-    if (cloudsRef.current) {
+-      cloudsRef.current.rotation.y += 0.0003;
++    if (groupRef.current) {
++      groupRef.current.rotation.y += 0.0003;
+     }
+   });
+ 
+-  // Create chunky cloud material with scattered patches
+-  const cloudMaterial = useMemo(() => {
+-    return new THREE.ShaderMaterial({
+-      transparent: true,
+-      side: THREE.DoubleSide,
+-      depthWrite: false,
+-      uniforms: {
+-        time: { value: 0 },
+-      },
+-      vertexShader: `
+-        varying vec2 vUv;
+-        varying vec3 vNormal;
+-        varying vec3 vPosition;
+-
+-        void main() {
+-          vUv = uv;
+-          vNormal = normalize(normalMatrix * normal);
+-          vPosition = position;
+-          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+-        }
+-      `,
+-      fragmentShader: `
+-        uniform float time;
+-        varying vec2 vUv;
+-        varying vec3 vNormal;
+-        varying vec3 vPosition;
+-
+-        // Noise functions
+-        float random(vec2 st) {
+-          return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+-        }
+-
+-        float noise(vec2 st) {
+-          vec2 i = floor(st);
+-          vec2 f = fract(st);
+-          float a = random(i);
+-          float b = random(i + vec2(1.0, 0.0));
+-          float c = random(i + vec2(0.0, 1.0));
+-          float d = random(i + vec2(1.0, 1.0));
+-          vec2 u = f * f * (3.0 - 2.0 * f);
+-          return mix(a, b, u.x) + (c - a) * u.y * (1.0 - u.x) + (d - b) * u.x * u.y;
+-        }
+-
+-        float fbm(vec2 st) {
+-          float value = 0.0;
+-          float amplitude = 0.5;
+-          for (int i = 0; i < 3; i++) {
+-            value += amplitude * noise(st);
+-            st *= 2.0;
+-            amplitude *= 0.5;
+-          }
+-          return value;
+-        }
+-
+-        void main() {
+-          // Create blocky, chunky cloud patches
+-          float scale = 4.0;
+-          vec2 pos = vUv * scale;
+-
+-          // Base cloud pattern
+-          float clouds = fbm(pos);
++  // Generate random cloud positions
++  const cloudPositions = useMemo(() => {
++    const positions: THREE.Vector3[] = [];
++    const numClouds = 20; // Number of cloud patches
+ 
+-          // Make it blockier by quantizing (creates steps)
+-          clouds = floor(clouds * 5.0) / 5.0;
++    for (let i = 0; i < numClouds; i++) {
++      // Random lat/lon
++      const lat = (Math.random() - 0.5) * 150; // -75 to 75 degrees
++      const lon = Math.random() * 360;
+ 
+-          // Lower threshold for more visible clouds
+-          clouds = smoothstep(0.4, 0.6, clouds);
+-
+-          // Add larger blocky shapes
+-          float blockSize = 0.6;
+-          vec2 blockPos = floor(pos / blockSize) * blockSize;
+-          float blocks = random(blockPos);
+-          blocks = step(0.45, blocks); // More blocks have clouds (was 0.6)
+-
+-          // Combine with base clouds
+-          clouds *= blocks;
+-
+-          // Make sure we have discrete patches
+-          if (clouds < 0.2) {
+-            clouds = 0.0;
+-          } else {
+-            clouds = 1.0; // Hard edge - either cloud or no cloud
+-          }
++      // Convert to 3D position, slightly above surface
++      const position = latLonToVector3(lat, lon, 2.15);
++      positions.push(position);
++    }
+ 
+-          // Lighting effect
+-          vec3 lightDir = normalize(vec3(1.0, 0.5, 1.0));
+-          float lighting = max(dot(vNormal, lightDir), 0.0) * 0.3 + 0.7;
+-
+-          // Slight shadow on bottom for 3D effect
+-          float shadow = step(vNormal.z, -0.2) * 0.25;
+-          lighting -= shadow;
+-
+-          // Fade at extreme viewing angles
+-          float viewFade = pow(1.0 - abs(dot(vNormal, vec3(0.0, 0.0, 1.0))), 2.0);
+-          clouds *= (1.0 - viewFade * 0.6);
+-
+-          // Bright white puffy clouds
+-          vec3 cloudColor = vec3(1.0, 1.0, 1.0) * lighting;
+-          float alpha = clouds * 0.9;
+-
+-          gl_FragColor = vec4(cloudColor, alpha);
+-        }
+-      `,
+-    });
++    return positions;
+   }, []);
+ 
+-  // Hover above surface
+   return (
+-    <Sphere ref={cloudsRef} args={[2.08, 64, 64]} material={cloudMaterial} />
++    <group ref={groupRef}>
++      {cloudPositions.map((pos, i) => (
++        <Cloud key={i} position={pos} />
++      ))}
++    </group>
+   );
+ }
+ 

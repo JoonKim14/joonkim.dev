@@ -1,0 +1,340 @@
+Index: WEBSITE_PLAN.md
+===================================================================
+diff --git a/WEBSITE_PLAN.md b/WEBSITE_PLAN.md
+new file mode 100644
+--- /dev/null	(date 1762741794263)
++++ b/WEBSITE_PLAN.md	(date 1762741794263)
+@@ -0,0 +1,333 @@
++# Joon Kim Personal Website - Project Plan
++
++**Last Updated:** November 9, 2025
++
++## Project Overview
++
++A personal website to market myself through personal branding, showcasing work, and sharing knowledge through writing.
++
++**Core Concept:** "A Green Sanctuary in Dark Space" - An interactive planet that visitors explore and fall in love with.
++
++---
++
++## 1. Purpose & Goals
++
++### Primary Purpose
++- Personal branding across job opportunities, freelance work, and tech community
++- Showcase projects and skills
++- Share knowledge through blogging
++- Make a memorable, emotional impression
++
++### What I Want Visitors To Do
++1. Fall in love with my work and "planet"
++2. Contact me for inquiries and opportunities
++3. View my projects and understand my capabilities
++4. Read my blog and engage with my knowledge
++5. Download my resume for formal applications
++
++### Target Audience
++- Potential employers and recruiters
++- Freelance clients
++- Fellow developers and tech community
++- Anyone interested in my work and writing
++
++---
++
++## 2. Site Structure
++
++### Core Pages
++- **Home** - Interactive 3D globe hero, featured work
++- **About** - My story, background, interests (fitness, psychology, development)
++- **Projects** - Portfolio with filtering by tech/category
++- **Blog** - Articles, tutorials, thoughts with tags
++- **Bookshelf** - Books I'm reading/have read with reviews
++- **Resume** - Interactive timeline + downloadable PDF
++- **Contact** - Contact form and social links
++
++### Features
++✓ Interactive 3D rotating globe navigation
++✓ Downloadable resume PDF
++✓ Blog with categories/tags
++✓ Project filtering by technology
++✓ Reading list with status
++✓ Social media links
++
++✗ No comments section
++✗ No newsletter (for now)
++✗ No user accounts
++
++---
++
++## 3. Design Vision
++
++### "A Green Sanctuary in Dark Space"
++
++**Emotional Journey:**
++- Visitors arrive in **cold, dark space** (uncertainty, vastness, fear)
++- They discover your **green, lush planet** (safety, warmth, home)
++- As they scroll, they transition from darkness → nature → comfort
++- Each section is a different biome of your world
++
++**Thematic Mapping:**
++- **Hero:** Enter orbit through dark space - discover the green oasis
++- **About:** Landing on the lush surface - getting to know the sanctuary
++- **Projects:** Exploring different biomes (forests, oceans, mountains)
++- **Blog:** Observatory/garden - thoughts, discoveries, and growth
++- **Bookshelf:** Library - seeds of knowledge from other worlds
++- **Contact:** Warm launch pad - where connections begin
++
++### Interactive Globe Hero (Inspired by Quanta Magazine)
++
++**3D Globe Features:**
++- Lush green continents with blue oceans (not dark - YOUR sanctuary!)
++- Rotatable with mouse/touch
++- Dark space background with parallax stars
++- Atmospheric glow around planet edges
++- Warm light source creating day/night
++
++**Navigation Pins (Color-Coded):**
++- 🌲 **Projects** - Green (forest biome)
++- 📝 **Blog** - Blue (observatory/garden)
++- 📚 **Bookshelf** - Teal (library)
++- 👤 **About** - Amber (landing site)
++- 📧 **Contact** - Gold (launch pad)
++
++**Fallbacks:**
++- Mobile: Static planet with clickable pins
++- Reduced motion: Non-rotating globe
++- Progressive enhancement: 2D → 3D
++
++### Visual Design Elements
++
++**Space Layer (Top/Outer):**
++- Parallax scrolling stars
++- Dark nebula clouds drifting
++- Constellation patterns
++- Interactive particles (react to mouse)
++
++**Planet Layer (Inner/Scrolled):**
++- Lush green surface textures
++- Ocean waves, forest canopy, mountain silhouettes
++- Floating leaves/nature particles
++- Warm atmospheric glows
++- Subtle animations (wind, water ripples)
++
++**Interaction Patterns:**
++- Smooth parallax scrolling creates depth
++- Scroll-triggered animations reveal sections
++- Hover effects respond to exploration
++- Cinematic transitions between sections
++
++### Color Palette
++
++**Space Colors (The Uncertain World):**
++- Deep blacks: `#0a0a0f`, `#111117`
++- Dark navy blues: `#0d1b2a`, `#1b263b`
++- Subtle purples: `#1a1a2e`, `#16213e`
++
++**Planet Colors (My Sanctuary):**
++- **Greens (Life):** `#2d6a4f`, `#40916c`, `#52b788`, `#74c69d`, `#95d5b2`
++- **Blues (Calm):** `#0077b6`, `#00b4d8`, `#48cae4`, `#90e0ef`, `#ade8f4`
++- **Warm (Energy):** `#f77f00`, `#fcbf49`, `#eae2b7`, `#ffb4a2`, `#e5989b`
++
++**Text Colors:**
++- On dark: Soft whites `#f8f9fa`, `#e9ecef`
++- Secondary: Muted grays `#adb5bd`, `#ced4da`
++- On light: Deep charcoal `#212529`, `#343a40`
++
++**Gradients:**
++- Dark space → planet atmosphere (dark blue → teal → green)
++- Sunrise on planet (deep purple → amber → gold)
++- Nature transitions (forest green → ocean blue)
++
++**Usage:**
++- Hero: Start in dark space, transition to planet colors
++- Scroll down: Gradually introduce more greens and warmth
++- Projects: Each project is a "biome" with palette colors
++- Blog: Observatory blues and greens
++- Contact: Warm launch pad with amber/gold
++
++---
++
++## 4. Technical Stack
++
++**Framework:** Astro 4.0+
++- Ships **zero JavaScript by default** - optimal performance
++- **Islands architecture** - static content stays static, only globe is interactive
++- Built-in MDX support for blog
++- Excellent SEO with static site generation
++- Framework agnostic (can use React only where needed)
++- Built-in image optimization
++- Deploy anywhere (Vercel, Netlify, Cloudflare)
++
++**3D Globe (React Island):**
++- **React Three Fiber** - Declarative 3D with React (only loaded for globe)
++- **Three.js** - WebGL 3D graphics engine
++- **@react-three/drei** - Helpers (OrbitControls, etc.)
++- **react-globe.gl** - Pre-built globe component (evaluate vs custom)
++
++**Animation & Styling:**
++- **Tailwind CSS** - Utility-first styling
++- **GSAP ScrollTrigger** - Lightweight parallax effects
++- **Framer Motion** (optional) - Page transitions if needed
++- CSS animations for simple effects
++
++**Content:**
++- **MDX** - Blog posts in Markdown with components (built into Astro)
++- Frontmatter for metadata (title, date, tags, etc.)
++- Content collections for type-safe content
++
++**Other:**
++- TypeScript
++- ESLint + Prettier
++- Vercel/Netlify Analytics (privacy-friendly)
++
++**Why This Stack:**
++
++1. **Performance First** - Astro ships minimal JS, perfect for "wow" first impression
++2. **Islands Architecture** - Only the 3D globe needs heavy JS, everything else is static HTML
++3. **Content-Heavy Site** - Blog, projects, bookshelf are all static content (Astro's strength)
++4. **Mobile Performance** - 54% of traffic is mobile, Astro excels here
++5. **SEO** - Static generation with no client-side routing overhead
++6. **Future-Proof** - Can add serverless functions or backend later if needed
++7. **Simplicity** - No backend complexity we don't need
++
++**Architecture:**
++```
++Astro (base)
++├── Static Pages: About, Projects, Blog, Bookshelf, Contact (zero JS)
++├── 3D Globe: React island with Three.js (only this loads JS)
++├── Parallax: GSAP for scroll effects (minimal JS)
++└── Content: MDX files for blog posts
++```
++
++**Technical Implementation Notes:**
++- Globe as client-only React island (`client:load` or `client:visible`)
++- Custom green/blue planet texture mapping
++- Pin markers: 3D objects or HTML overlays on globe
++- OrbitControls for rotation, raycasting for pin clicks
++- Level-of-detail optimization for mobile
++- Lazy load 3D assets for performance
++- Respect `prefers-reduced-motion` for accessibility
++- Dark mode default (space theme), light mode = daytime planet
++- No backend needed - use services (Formspree for contact, etc.)
++
++---
++
++## 5. Content Guidelines
++
++### Tone & Voice
++- Authentic and genuine
++- Professional but personable
++- Clear and accessible
++- Hints of playfulness
++
++### Content Philosophy
++- Focus on storytelling, not just listing achievements
++- Each project is a "landmark" on my planet
++- Blog posts are "transmissions" or "discoveries"
++- Show personality through content and design
++- Make it memorable - visitors want to return
++
++### Stories to Tell
++- My journey as a developer
++- Projects I've built and why
++- Things I've learned
++- Personal interests (fitness, psychology, tech)
++- Experiences and insights
++
++---
++
++## 6. Design Research
++
++**Inspiration Sites:**
++- ✓ [Skyroot.in](https://www.skyroot.in/) - Parallax, space theme, depth, smooth animations
++- ✓ [Quanta Magazine](https://www.quantamagazine.org/how-we-came-to-know-earth-20250915/) - Interactive 3D globe with pins
++
++**Still Need:**
++- [ ] 3-5 more portfolio/space-themed sites for inspiration
++- [ ] Typography examples (modern, readable, warm)
++- [ ] Create mood board with nature + space aesthetics
++
++---
++
++## 7. Next Steps
++
++### Phase 1: Planning & Design (Current)
++- [x] Define core concept and vision
++- [x] Choose tech stack
++- [x] Define color palette philosophy
++- [ ] Finalize exact hex codes
++- [ ] Choose typography
++- [ ] Create wireframes/mockups of globe interface
++- [ ] Sketch parallax layer concepts
++- [ ] Find more design inspiration
++
++### Phase 2: Development
++- [ ] Set up Astro 4.0+ project with TypeScript
++- [ ] Configure Astro for React integration (for globe island)
++- [ ] Install Tailwind CSS, GSAP ScrollTrigger
++- [ ] Install Three.js, React Three Fiber, @react-three/drei
++- [ ] Build interactive globe component as React island
++- [ ] Implement pin navigation system
++- [ ] Create page layouts and components
++- [ ] Add parallax scrolling effects with GSAP
++- [ ] Implement responsive design
++- [ ] Optimize performance (lazy loading, compression)
++- [ ] Set up content collections for blog posts
++
++### Phase 3: Content Creation
++- [ ] Write About page bio
++- [ ] Document all projects with details
++- [ ] Write initial 3-5 blog posts
++- [ ] Create reading list
++- [ ] Update resume/timeline
++
++### Phase 4: Launch
++- [ ] Final testing (all devices, browsers)
++- [ ] SEO optimization (meta tags, Open Graph, sitemap)
++- [ ] Set up analytics (Vercel/Netlify Analytics)
++- [ ] Configure contact form (Formspree or Netlify Forms)
++- [ ] Deploy to Vercel or Netlify
++- [ ] Set up custom domain (joonkim.dev)
++- [ ] Share with world
++
++---
++
++## 8. Third-Party Services (No Backend Needed)
++
++Instead of building backend features, we'll use these services:
++
++- **Contact Form:** Formspree or Netlify Forms (free tier)
++- **Analytics:** Vercel Analytics or Netlify Analytics (privacy-friendly)
++- **Newsletter:** ConvertKit or Buttondown (if/when needed)
++- **Comments:** None initially (keeping it simple)
++- **Hosting:** Vercel or Netlify (both have generous free tiers)
++- **Domain:** joonkim.dev (already owned)
++
++**Future options if needed:**
++- Serverless functions (Astro supports them)
++- Supabase/Firebase for database (if complexity grows)
++- Can always migrate specific features later
++
++---
++
++## 9. Open Questions
++
++1. **Domain:** Keep joonkim.dev or change?
++2. **Content:** Which projects to feature first?
++3. **Writing:** What blog topics initially?
++4. **Typography:** Which fonts for modern/warm feel?
++5. **Globe Texture:** Custom design or use existing Earth texture as base?
++6. **Deployment:** Vercel or Netlify? (both work great with Astro)
++
++---
++
++## 10. Notes
++
++- Consider adding "Uses" page (tools/setup)
++- Consider "Now" page (what I'm currently doing)
++- Ensure accessibility (keyboard navigation, screen readers, reduced motion)
++- Preload critical assets (globe texture, fonts)
++- Test on slow connections
++- Add loading states for 3D globe
