@@ -1,6 +1,6 @@
 # Joon Kim's Personal Website
 
-**"A Green Sanctuary in Dark Space"**
+**Welcome to my Planet**
 
 An interactive 3D portfolio website built with Astro, React Three Fiber, and Tailwind CSS.
 
@@ -54,3 +54,4 @@ npm run preview
 ## License
 
 MIT
+
