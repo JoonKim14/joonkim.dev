@@ -1,0 +1,112 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RPGPanel from '../components/RPGPanel.astro';
+import { getCollection } from 'astro:content';
+
+const statusOrder = {
+  IN_PROGRESS: 0,
+  COMPLETED: 1,
+  ABANDONED: 2,
+} as const;
+
+const statusLabel = {
+  IN_PROGRESS: 'IN PROGRESS',
+  COMPLETED: 'COMPLETED',
+  ABANDONED: 'ABANDONED',
+} as const;
+
+const statusClass = {
+  IN_PROGRESS: 'text-cyan',
+  COMPLETED: 'text-bar-hp',
+  ABANDONED: 'text-crimson',
+} as const;
+
+let projects: Awaited<ReturnType<typeof getCollection<'projects'>>> = [];
+let projectsError = '';
+
+try {
+  projects = (await getCollection('projects')).sort((a, b) => {
+    const statusDiff = statusOrder[a.data.status] - statusOrder[b.data.status];
+    if (statusDiff !== 0) return statusDiff;
+    return a.data.name.localeCompare(b.data.name);
+  });
+} catch (error) {
+  projectsError = 'Quest log is temporarily unavailable. Please check the projects content schema.';
+  console.error('Failed to load projects collection:', error);
+}
+
+const stars = (difficulty: number) => {
+  const value = Number.isFinite(difficulty) ? Math.min(5, Math.max(1, Math.floor(difficulty))) : 1;
+  return '★'.repeat(value) + '☆'.repeat(5 - value);
+};
+---
+
+<Layout title="Quest Log | Projects">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#2b1a40_0%,_#1a1a2e_50%,_#0f0a17_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto max-w-5xl">
+      <RPGPanel title="Quest Log | Projects">
+        {projectsError ? (
+          <p class="rounded border-2 border-crimson/70 bg-panel-dark/55 p-4 text-xl text-crimson/90">
+            {projectsError}
+          </p>
+        ) : (
+          <div class="grid gap-4">
+            {projects.map((project) => (
+              <article class="rounded border-2 border-panel-light/70 bg-panel-dark/45 p-5">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <h3 class="font-pixel text-[10px] uppercase tracking-wide text-gold">{project.data.name}</h3>
+                  <p class:list={['font-pixel text-[10px] uppercase', statusClass[project.data.status]]}>
+                    {statusLabel[project.data.status]}
+                  </p>
+                </div>
+
+                <p class="mt-2 text-xl text-parchment/90">{project.data.tagline}</p>
+                <p class="mt-2 text-lg leading-relaxed text-parchment/80">{project.data.description}</p>
+
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {project.data.tech.map((tech) => (
+                    <span class="rounded border border-panel-light/70 bg-panel-dark px-2 py-1 text-base text-cyan/90">
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+
+                <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-panel-light/60 pt-3">
+                  <p class="font-pixel text-[10px] text-parchment/70">
+                    Difficulty: <span class="text-orange">{stars(project.data.difficulty)}</span>
+                  </p>
+
+                  <div class="flex flex-wrap gap-4 text-lg">
+                    {project.data.repo && (
+                      <a
+                        href={project.data.repo}
+                        target="_blank"
+                        rel="noreferrer"
+                        class="text-gold/90 hover:text-gold transition-colors"
+                      >
+                        Repo
+                      </a>
+                    )}
+                    {project.data.demo && (
+                      <a
+                        href={project.data.demo}
+                        target="_blank"
+                        rel="noreferrer"
+                        class="text-cyan/90 hover:text-cyan transition-colors"
+                      >
+                        Live Demo
+                      </a>
+                    )}
+                    {!project.data.repo && !project.data.demo && (
+                      <span class="text-parchment/45">No public links yet</span>
+                    )}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>

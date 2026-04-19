@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RPGPanel from '../components/RPGPanel.astro';
+
+const achievements = [
+  { icon: '🏆', title: 'HIRED!', description: 'Landed my first software engineering role.' },
+  { icon: '🔍', title: 'PROBLEM FINDER', description: 'Caught production-impacting bugs before rollout.' },
+  { icon: '📚', title: 'THE SCHOLAR', description: 'Built a sustained non-fiction reading habit.' },
+  { icon: '🎵', title: 'DUAL CLASS', description: 'Can code and sing, usually not at the same time.' },
+  { icon: '🌙', title: 'NIGHT OWL', description: 'Committed code past 2 AM more times than I should admit.' },
+  { icon: '🧠', title: 'UNSOLICITED WISDOM', description: 'Recommended a psychology book in a code review thread.' },
+  { icon: '💪', title: 'IRON DISCIPLINE', description: 'Kept training consistency through crunch periods.' },
+  { icon: '🗺️', title: 'POLYMATH', description: 'Interests span engineering, mind, body, and art.' },
+];
+---
+
+<Layout title="Hall of Fame | Achievements">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#3f2a63_0%,_#1d1b38_50%,_#0f0d1e_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto max-w-5xl">
+      <RPGPanel title="Hall Of Fame">
+        <div class="grid gap-4 sm:grid-cols-2">
+          {achievements.map((achievement) => (
+            <article class="rounded border-2 border-panel-light/70 bg-panel-dark/45 p-4">
+              <p class="text-3xl">{achievement.icon}</p>
+              <h3 class="mt-2 font-pixel text-[10px] uppercase tracking-wide text-gold">
+                {achievement.title}
+              </h3>
+              <p class="mt-2 text-xl leading-relaxed text-parchment/85">{achievement.description}</p>
+            </article>
+          ))}
+        </div>
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>

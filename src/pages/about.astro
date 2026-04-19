@@ -1,0 +1,86 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RPGPanel from '../components/RPGPanel.astro';
+
+const stats = [
+  { key: 'STR', score: 8, label: 'Discipline', desc: 'Gym consistency, habits, follow-through.' },
+  { key: 'INT', score: 10, label: 'Curiosity', desc: 'Psychology, philosophy, software, and endless questions.' },
+  { key: 'WIS', score: 8, label: 'Pattern Detect', desc: "Spotting weak assumptions and hidden failure modes early." },
+  { key: 'DEX', score: 7, label: 'Adaptability', desc: 'Comfortable switching between product, backend, and AI tooling.' },
+  { key: 'CHA', score: 9, label: 'Expression', desc: 'Writing and speaking clearly, then shipping on top of it.' },
+  { key: 'VIT', score: 8, label: 'Longevity', desc: 'Health-first systems that survive busy seasons.' },
+];
+
+const passiveSkills = [
+  'Psychology',
+  'Philosophy',
+  'Fitness',
+  'Singing',
+  'Personal Development',
+  'Behavioral Science',
+];
+
+const equippedItems = [
+  'TypeScript + Astro',
+  'Go + Python',
+  'SQL + Postgres',
+  'Cloudflare',
+  'LLM-assisted workflows',
+];
+---
+
+<Layout title="Home | Character Sheet">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#2d1b69_0%,_#1a1a2e_45%,_#120a17_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto grid max-w-5xl gap-6">
+      <RPGPanel title="Home | Character Sheet">
+        <div class="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+          <div class="space-y-4 text-xl leading-relaxed text-parchment/85">
+            <p>
+              I build software with a systems mindset and a strong bias for clarity.
+              I care about solving the right problem before optimizing the wrong one.
+            </p>
+            <p>
+              By day, I work as a software engineer at Geotab. Outside work, I treat learning like an RPG skill tree:
+              tech, psychology, philosophy, fitness, and creative expression all feed each other.
+            </p>
+            <p class="text-gold/90">
+              Flavor text: A curious generalist who min-maxes consistency and turns fuzzy ideas into shippable systems.
+            </p>
+          </div>
+
+          <div class="rounded border-2 border-panel-light/80 bg-panel-dark/50 p-4">
+            <h3 class="font-pixel text-[10px] uppercase tracking-wide text-gold">Passive Skills</h3>
+            <ul class="mt-3 grid gap-2 text-lg text-parchment/80">
+              {passiveSkills.map((skill) => (
+                <li>• {skill}</li>
+              ))}
+            </ul>
+
+            <h3 class="mt-6 font-pixel text-[10px] uppercase tracking-wide text-cyan">Equipped Items</h3>
+            <ul class="mt-3 grid gap-2 text-lg text-parchment/80">
+              {equippedItems.map((item) => (
+                <li>▸ {item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </RPGPanel>
+
+      <RPGPanel title="Core Stats">
+        <div class="grid gap-4">
+          {stats.map((stat) => (
+            <div class="rounded border-2 border-panel-light/70 bg-panel-dark/45 p-4">
+              <div class="flex items-center justify-between gap-3">
+                <p class="font-pixel text-[10px] text-gold">{stat.key}</p>
+                <p class="font-pixel text-[10px] text-parchment/70">{'█'.repeat(stat.score)}{'░'.repeat(10 - stat.score)}</p>
+              </div>
+              <p class="mt-1 text-xl text-parchment">
+                <span class="text-gold">{stat.label}</span> · {stat.desc}
+              </p>
+            </div>
+          ))}
+        </div>
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>

@@ -1,15 +1,15 @@
+// @ts-check
 import { defineConfig } from 'astro/config';
-import react from '@astrojs/react';
-import tailwind from '@astrojs/tailwind';
-import mdx from '@astrojs/mdx';
+
+import cloudflare from '@astrojs/cloudflare';
+import tailwindcss from '@tailwindcss/vite';
 
 // https://astro.build/config
 export default defineConfig({
+  adapter: cloudflare(),
   site: 'https://joonkim.dev',
-  integrations: [
-    react(),
-    tailwind(),
-    mdx()
-  ],
-  output: 'static'
+
+  vite: {
+    plugins: [tailwindcss()]
+  }
 });

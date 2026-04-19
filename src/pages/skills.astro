@@ -1,0 +1,80 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RPGPanel from '../components/RPGPanel.astro';
+
+const rarityGroups = [
+  {
+    rarity: 'LEGENDARY',
+    rarityClass: 'text-gold',
+    items: [
+      { name: 'Problem Detection', note: 'Finds edge cases early before they become incidents.' },
+      { name: 'Systems Thinking', note: 'Connects product, data, and architecture constraints.' },
+    ],
+  },
+  {
+    rarity: 'EPIC',
+    rarityClass: 'text-purple',
+    items: [
+      { name: 'Python', note: 'Automation, data tooling, and service glue.' },
+      { name: 'Go', note: 'Backend services where simplicity and speed matter.' },
+      { name: 'SQL', note: 'Query tuning and schema-aware data modeling.' },
+      { name: 'Backend Architecture', note: 'Designing stable service boundaries and contracts.' },
+    ],
+  },
+  {
+    rarity: 'RARE',
+    rarityClass: 'text-cyan',
+    items: [
+      { name: 'TypeScript', note: 'Typed frontend/backend workflows and API contracts.' },
+      { name: 'React/Astro', note: 'Fast interfaces with pragmatic DX.' },
+      { name: 'DevOps Fundamentals', note: 'CI/CD, observability basics, and deployment hygiene.' },
+    ],
+  },
+  {
+    rarity: 'UNCOMMON',
+    rarityClass: 'text-bar-hp',
+    items: [
+      { name: 'Philosophy', note: 'Useful for first-principles framing and tradeoff clarity.' },
+      { name: 'Behavioral Science', note: 'Helps shape habits, UX, and communication patterns.' },
+    ],
+  },
+  {
+    rarity: 'COMMON',
+    rarityClass: 'text-parchment/80',
+    items: [
+      { name: 'Git', note: 'Clean commit hygiene, debugging, and review flow.' },
+      { name: 'Linux', note: 'Comfortable with day-to-day terminal-first workflows.' },
+      { name: 'Communication', note: 'Direct writing and decision framing.' },
+    ],
+  },
+];
+---
+
+<Layout title="Shop | Skills & Stack">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#23335a_0%,_#1a1a2e_52%,_#0f101c_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto max-w-5xl">
+      <RPGPanel title="Shop | Inventory">
+        <div class="grid gap-4">
+          {rarityGroups.map((group) => (
+            <section class="rounded border-2 border-panel-light/70 bg-panel-dark/45 p-4">
+              <h3 class:list={['font-pixel text-[10px] uppercase tracking-wide', group.rarityClass]}>
+                [{group.rarity}]
+              </h3>
+              <div class="mt-3 grid gap-2">
+                {group.items.map((item) => (
+                  <div
+                    class="rounded border border-panel-light/70 bg-panel-dark/70 px-3 py-2"
+                    title={item.note}
+                  >
+                    <p class="text-xl text-parchment">{item.name}</p>
+                    <p class="text-lg text-parchment/65">{item.note}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>

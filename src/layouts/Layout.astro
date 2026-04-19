@@ -1,40 +1,60 @@
 ---
+import '../styles/global.css';
+
 interface Props {
-  title: string;
+  title?: string;
   description?: string;
 }
 
-const { title, description = "Joon Kim's personal website - A green sanctuary in dark space" } = Astro.props;
+const { title = 'joonkim.dev', description = 'A retro pixel-art RPG personal website.' } = Astro.props;
+
+const isHome = Astro.url.pathname === '/';
+const isCredits = Astro.url.pathname === '/credits' || Astro.url.pathname === '/credits/';
 ---
 
-<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="description" content={description} />
-    <meta name="viewport" content="width=device-width" />
+    <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
+    <meta name="description" content={description} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap"
+      rel="stylesheet"
+    />
+
     <title>{title}</title>
   </head>
-  <body class="bg-space-black text-white">
+  <body>
+    {!isHome && (
+      <nav class="fixed top-4 left-4 z-50">
+        <a
+          href={isCredits ? '/#menu' : '/#town'}
+          class="inline-flex items-center rounded border-2 border-panel-light/80 bg-panel/80 px-3 py-2 font-pixel text-[9px] uppercase tracking-wide text-gold hover:text-parchment transition-colors"
+        >
+          ← Back to {isCredits ? 'Menu' : 'Town'}
+        </a>
+      </nav>
+    )}
     <slot />
+    {!isHome && (
+      <footer class="px-4 pb-8 pt-6 text-center">
+        <p class="font-retro text-base text-parchment/40">
+          Music by Clement Panchout ·
+          <a
+            href="https://www.clementpanchout.com"
+            target="_blank"
+            rel="noreferrer"
+            class="text-gold/80 hover:text-gold transition-colors"
+          >
+            clementpanchout.com
+          </a>
+        </p>
+      </footer>
+    )}
   </body>
 </html>
-
-<style is:global>
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-  }
-
-  html {
-    font-family: system-ui, sans-serif;
-    scroll-behavior: smooth;
-  }
-
-  body {
-    min-height: 100vh;
-  }
-</style>

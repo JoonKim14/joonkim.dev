@@ -1,0 +1,53 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RPGPanel from '../components/RPGPanel.astro';
+---
+
+<Layout title="Credits | joonkim.dev">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#433020_0%,_#211915_50%,_#120d0b_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto grid max-w-4xl gap-6">
+      <RPGPanel title="Credits">
+        <div class="space-y-5 text-xl text-parchment/85">
+          <div>
+            <h3 class="font-pixel text-[10px] uppercase tracking-wide text-gold">Music</h3>
+            <p class="mt-2">
+              "Life is full of Joy" from "Yet Another Free Music Pack"
+              by Clement Panchout (CC BY 4.0).
+            </p>
+            <p>
+              Required attribution:
+              <span class="text-gold">Music by Clement Panchout – www.clementpanchout.com</span>
+            </p>
+            <a
+              href="https://clement-panchout.itch.io/yet-another-free-music-pack"
+              target="_blank"
+              rel="noreferrer"
+              class="text-cyan hover:text-cyan/80 transition-colors"
+            >
+              Source Pack
+            </a>
+          </div>
+
+          <div>
+            <h3 class="font-pixel text-[10px] uppercase tracking-wide text-gold">Design Inspiration</h3>
+            <p class="mt-2">
+              Maplestory and Stardew Valley for tone: cozy, playful, and grounded.
+            </p>
+          </div>
+
+          <div>
+            <h3 class="font-pixel text-[10px] uppercase tracking-wide text-gold">Built With</h3>
+            <p class="mt-2">Astro, Tailwind CSS, TypeScript, and Cloudflare.</p>
+          </div>
+
+          <div>
+            <h3 class="font-pixel text-[10px] uppercase tracking-wide text-gold">Human Thanks</h3>
+            <p class="mt-2">
+              Family, mentors, teammates, and friends who sharpen my thinking and keep me honest.
+            </p>
+          </div>
+        </div>
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>

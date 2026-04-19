@@ -1,0 +1,53 @@
+{
+  "rpg-portfolio": {
+    "name": "Town of Joon",
+    "tagline": "Retro RPG-style personal website built with Astro.",
+    "status": "IN_PROGRESS",
+    "difficulty": 4,
+    "tech": [
+      "Astro",
+      "TypeScript",
+      "Tailwind CSS",
+      "Cloudflare"
+    ],
+    "description": "A map-based portfolio experience with custom content collections, story-themed routing, and game-like UI panels.",
+    "repo": "https://github.com/joonkim/joonkim.dev",
+    "demo": "https://joonkim.dev"
+  },
+  "telemetry-anomaly-radar": {
+    "name": "Telemetry Anomaly Radar",
+    "tagline": "Signal detection pipeline for noisy fleet telemetry.",
+    "status": "COMPLETED",
+    "difficulty": 5,
+    "tech": [
+      "Go",
+      "Python",
+      "PostgreSQL",
+      "Docker"
+    ],
+    "description": "Designed heuristics and alert scoring to surface meaningful anomalies while reducing false positives from high-volume telemetry streams."
+  },
+  "voice-note-indexer": {
+    "name": "Voice Note Indexer",
+    "tagline": "Searchable transcript system for quick idea capture.",
+    "status": "IN_PROGRESS",
+    "difficulty": 3,
+    "tech": [
+      "TypeScript",
+      "OpenAI API",
+      "SQLite"
+    ],
+    "description": "Converts voice notes into tagged summaries so ideas can be searched, grouped, and revisited as project seeds."
+  },
+  "philosophy-digest-bot": {
+    "name": "Philosophy Digest Bot",
+    "tagline": "Daily bite-sized philosophy summaries.",
+    "status": "ABANDONED",
+    "difficulty": 2,
+    "tech": [
+      "Python",
+      "Telegram Bot API"
+    ],
+    "description": "Prototype for daily philosophy prompts. Retired after discovering lower user retention than expected."
+  }
+}

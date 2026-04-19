@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RPGPanel from '../components/RPGPanel.astro';
+
+const updatedAt = new Date('2026-04-18');
+
+const nowItems = [
+  { icon: '📖', label: 'Currently Reading', value: 'Meditations + Designing Data-Intensive Applications' },
+  { icon: '🔨', label: 'Currently Building', value: 'This RPG-style portfolio and a cleaner personal knowledge pipeline' },
+  { icon: '🎵', label: 'Currently Listening To', value: 'Lo-fi pixel playlists, jazz piano, and occasional K-R&B' },
+  { icon: '🧠', label: 'Currently Thinking About', value: 'How to design systems that stay simple as complexity grows' },
+  { icon: '💪', label: 'Currently Training For', value: 'Strength consistency and long-term injury-free progression' },
+  { icon: '📍', label: 'Currently Located', value: 'Ontario, Canada' },
+];
+---
+
+<Layout title="Noticeboard | Now">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#1f4b4b_0%,_#172738_48%,_#0b1117_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto max-w-4xl">
+      <RPGPanel title="Noticeboard | Menu Of The Day">
+        <p class="mb-5 text-xl text-parchment/75">
+          Last updated: {updatedAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+        </p>
+
+        <div class="grid gap-3">
+          {nowItems.map((item) => (
+            <article class="rounded border-2 border-panel-light/70 bg-panel-dark/45 p-4">
+              <p class="font-pixel text-[10px] uppercase tracking-wide text-gold">
+                {item.icon} {item.label}
+              </p>
+              <p class="mt-2 text-xl leading-relaxed text-parchment/90">{item.value}</p>
+            </article>
+          ))}
+        </div>
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>

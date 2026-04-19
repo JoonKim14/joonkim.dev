@@ -1,48 +1,279 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Globe from '../components/Globe';
+
+const BIRTH_YEAR = 2002;
+const level = new Date().getFullYear() - BIRTH_YEAR;
+
+const buildings = [
+  { emoji: '🏠', name: 'Home', desc: 'Character Sheet', href: '/about' },
+  { emoji: '🗺️', name: 'Quest Log', desc: 'Projects', href: '/projects' },
+  { emoji: '📖', name: 'Field Notes', desc: 'Blog', href: '/blog' },
+  { emoji: '🏪', name: 'Shop', desc: 'Skills & Stack', href: '/skills' },
+  { emoji: '🏛️', name: 'Library', desc: 'Bookshelf', href: '/bookshelf' },
+  { emoji: '📋', name: 'Noticeboard', desc: 'Now', href: '/now' },
+  { emoji: '⚔️', name: 'Guild Hall', desc: 'Contact', href: '/contact' },
+  { emoji: '🏆', name: 'Hall of Fame', desc: 'Achievements', href: '/achievements' },
+];
 ---
 
-<Layout title="Joon Kim - Developer">
-  <main class="min-h-screen">
-    <!-- Globe Section -->
-    <section class="relative h-screen flex items-center justify-center overflow-hidden">
-      <!-- Starfield Background -->
-      <div class="absolute inset-0 bg-gradient-to-b from-transparent via-space-purple to-space-black"></div>
+<Layout title="joonkim.dev">
 
-      <!-- Globe Component (React Island) -->
-      <div class="relative z-10 w-full h-full">
-        <Globe client:load />
+  <script is:inline>
+    (function() {
+      var h = location.hash.slice(1);
+      if (h === 'town' || h === 'menu') {
+        document.documentElement.dataset.skipTo = h;
+      }
+    })();
+  </script>
+
+  <!-- ════ SPLASH SCREEN ════ -->
+  <div id="splash" class="screen active">
+    <div id="stars" class="absolute inset-0 overflow-hidden"></div>
+    <div class="relative z-10 text-center px-4">
+      <h1
+        class="font-pixel text-3xl sm:text-5xl tracking-wider text-gold mb-2"
+        style="text-shadow: 0 0 30px rgba(255, 215, 0, 0.4), 0 0 60px rgba(255, 215, 0, 0.15);"
+      >
+        JOON.DEV
+      </h1>
+      <p class="font-retro text-xl text-parchment/60 mt-2 mb-16">
+        A Polymath's Adventure
+      </p>
+      <p class="font-pixel text-[10px] sm:text-xs text-parchment/70 blink">
+        Press any key to continue
+      </p>
+    </div>
+  </div>
+
+  <!-- ════ LOADING SCREEN ════ -->
+  <div id="loading" class="screen">
+    <div id="loading-stars" class="absolute inset-0 overflow-hidden"></div>
+    <div class="relative z-10 text-center px-4 w-full max-w-md">
+      <p class="font-pixel text-sm text-parchment mb-6">LOADING...</p>
+      <div class="progress-container mx-auto">
+        <div class="progress-fill" id="progress-fill"></div>
       </div>
-    </section>
-    
-    <!-- Hero Text Section -->
-    <section class="relative pt-32 pb-12 px-8 bg-gradient-to-b from-space-black via-space-navy to-transparent">
-      <div class="text-center">
-        <h1 class="text-7xl font-bold mb-6 bg-gradient-to-r from-planet-green-light to-planet-blue-medium bg-clip-text text-transparent">
-          Joon Kim
-        </h1>
-        <p class="text-2xl text-gray-300 mb-8">
-          Welcome to my planet
-        </p>
+      <p class="font-retro text-lg text-parchment/60 mt-6 h-8" id="loading-tip">
+        Loading curiosity module...
+      </p>
+    </div>
+  </div>
 
-        <!-- Scroll Indicator -->
-        <div class="animate-bounce">
-          <svg class="w-8 h-8 text-planet-green-light mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-          </svg>
+  <!-- ════ MAIN MENU ════ -->
+  <div id="menu" class="screen">
+    <div id="menu-stars" class="absolute inset-0 overflow-hidden"></div>
+    <div class="relative z-10 flex flex-col md:flex-row gap-6 md:gap-10 items-center px-4 max-w-3xl w-full">
+      <!-- Player Card -->
+      <div class="rpg-panel w-full md:w-auto md:min-w-[320px]">
+        <h2 class="rpg-panel-title">Player Select</h2>
+        <div class="font-retro text-lg space-y-3">
+          <div class="flex justify-between gap-4">
+            <span class="text-parchment/60">PLAYER</span>
+            <span class="text-gold font-bold">Joon Kim</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-parchment/60">CLASS</span>
+            <span class="text-gold font-bold">Polymath Developer</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-parchment/60">GUILD</span>
+            <span class="text-gold font-bold">Geotab</span>
+          </div>
+          <div class="flex justify-between gap-4">
+            <span class="text-parchment/60">LEVEL</span>
+            <span class="text-gold font-bold">{level}</span>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- About Section (placeholder) -->
-    <section class="py-20 px-8 bg-gradient-to-b from-space-purple to-space-black">
-      <div class="max-w-4xl mx-auto text-center">
-        <h2 class="text-4xl font-bold mb-6 text-planet-green-light">About</h2>
-        <p class="text-lg text-gray-300 leading-relaxed">
-          This is my planet! A place of good vibes and growth.
-        </p>
+      <!-- Menu Options -->
+      <div class="rpg-panel w-full md:w-auto md:min-w-[240px]">
+        <h2 class="rpg-panel-title">Menu</h2>
+        <div class="space-y-2">
+          <button id="btn-continue" class="menu-option selected">▶ Continue</button>
+          <a href="/credits" class="menu-option">&nbsp;&nbsp;Credits</a>
+        </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
+
+  <!-- ════ TOWN HUB ════ -->
+  <div id="town" class="screen">
+    <div id="town-stars" class="absolute inset-0 overflow-hidden"></div>
+    <button
+      id="btn-back-menu"
+      class="absolute left-4 top-4 z-20 inline-flex items-center rounded border-2 border-panel-light/80 bg-panel/80 px-3 py-2 font-pixel text-[9px] uppercase tracking-wide text-gold hover:text-parchment transition-colors"
+    >
+      ← Back to Menu
+    </button>
+
+    <!-- Ground gradient at bottom -->
+    <div class="absolute bottom-0 left-0 right-0 h-1/4 bg-gradient-to-t from-[#2a1f14] to-transparent"></div>
+
+    <div class="relative z-10 w-full max-w-4xl px-4">
+      <h2
+        class="font-pixel text-sm sm:text-base text-gold text-center mb-8"
+        style="text-shadow: 0 0 20px rgba(255, 215, 0, 0.3);"
+      >
+        ─── TOWN OF JOON ───
+      </h2>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+        {buildings.map((b) => (
+          <a href={b.href} class="rpg-panel building-card text-center">
+            <div class="text-3xl mb-2">{b.emoji}</div>
+            <div class="building-name font-pixel text-[9px] sm:text-[10px] uppercase tracking-wide mb-1">
+              {b.name}
+            </div>
+            <div class="font-retro text-sm text-parchment/50">
+              {b.desc}
+            </div>
+          </a>
+        ))}
+      </div>
+
+      <p class="font-retro text-sm text-parchment/30 text-center mt-8">
+        Click a building to explore
+      </p>
+    </div>
+  </div>
+
 </Layout>
+
+<script>
+  const LOADING_TIPS = [
+    'Loading curiosity module...',
+    'Installing opinions on Nietzsche...',
+    'Calibrating hot takes...',
+    'Syncing gym schedule...',
+    'Compiling bad puns...',
+    'Loading bookshelf... (this takes a while)',
+    'Buffering existential questions...',
+    'Optimizing shower thoughts...',
+    'Downloading extra motivation...',
+    'Indexing Spotify playlists...',
+    'Warming up vocal cords...',
+    'Defragmenting reading list...',
+    'Parsing philosophical debates...',
+    'Initializing coffee dependency...',
+    'Reticulating splines...',
+  ];
+
+  const LOADING_DURATION = 2000;
+  const TIP_INTERVAL = 1200;
+
+  // ── Stars ──
+  function createStars(containerId: string, count: number) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    for (let i = 0; i < count; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() < 0.3 ? 2 : 1;
+      Object.assign(star.style, {
+        left: `${Math.random() * 100}%`,
+        top: `${Math.random() * 70}%`,
+        width: `${size}px`,
+        height: `${size}px`,
+        animation: `twinkle ${2 + Math.random() * 3}s ease-in-out ${Math.random() * 3}s infinite`,
+      });
+      container.appendChild(star);
+    }
+  }
+
+  createStars('stars', 80);
+  createStars('loading-stars', 80);
+  createStars('menu-stars', 80);
+  createStars('town-stars', 80);
+
+  // ── Screen transitions ──
+  type Screen = 'splash' | 'loading' | 'menu' | 'town';
+  let current: Screen = 'splash';
+
+  function showScreen(id: Screen, instant = false) {
+    const screens = document.querySelectorAll('.screen');
+    if (instant) {
+      screens.forEach((el) => {
+        (el as HTMLElement).style.transition = 'none';
+        el.classList.remove('active');
+      });
+      const target = document.getElementById(id);
+      if (target) {
+        target.style.transition = 'none';
+        target.classList.add('active');
+        void target.offsetHeight;
+        target.style.transition = '';
+      }
+      screens.forEach((el) => {
+        void (el as HTMLElement).offsetHeight;
+        (el as HTMLElement).style.transition = '';
+      });
+    } else {
+      screens.forEach((el) => el.classList.remove('active'));
+      document.getElementById(id)?.classList.add('active');
+    }
+    current = id;
+  }
+
+  // ── Hash routing (back from section pages) ──
+  const hash = window.location.hash.slice(1) as Screen;
+  if (hash === 'town' || hash === 'menu') {
+    showScreen(hash, true);
+    delete document.documentElement.dataset.skipTo;
+    history.replaceState(null, '', '/');
+  }
+
+  // ── Splash → Loading ──
+  function startLoading() {
+    if (current !== 'splash') return;
+    showScreen('loading');
+
+    const fill = document.getElementById('progress-fill') as HTMLElement;
+    const tipEl = document.getElementById('loading-tip') as HTMLElement;
+    const start = performance.now();
+    let tipIndex = 0;
+
+    const tipTimer = setInterval(() => {
+      tipIndex = (tipIndex + 1) % LOADING_TIPS.length;
+      tipEl.style.opacity = '0';
+      setTimeout(() => {
+        tipEl.textContent = LOADING_TIPS[tipIndex];
+        tipEl.style.opacity = '1';
+      }, 150);
+    }, TIP_INTERVAL);
+
+    function tick() {
+      const elapsed = performance.now() - start;
+      const progress = Math.min(elapsed / LOADING_DURATION, 1);
+      fill.style.width = `${progress * 100}%`;
+
+      if (progress < 1) {
+        requestAnimationFrame(tick);
+      } else {
+        clearInterval(tipTimer);
+        setTimeout(() => showScreen('menu'), 400);
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  document.addEventListener('keydown', () => startLoading(), { once: true });
+  document.getElementById('splash')?.addEventListener('click', () => startLoading(), { once: true });
+
+  // ── Menu → Town ──
+  document.getElementById('btn-continue')?.addEventListener('click', () => {
+    showScreen('town');
+  });
+
+  document.getElementById('btn-back-menu')?.addEventListener('click', () => {
+    showScreen('menu');
+  });
+</script>
+
+<style>
+  #loading-tip {
+    transition: opacity 0.15s ease;
+  }
+</style>

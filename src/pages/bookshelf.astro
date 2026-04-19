@@ -1,0 +1,118 @@
+---
+import Layout from '../layouts/Layout.astro';
+import RPGPanel from '../components/RPGPanel.astro';
+
+type BookStatus = 'READ' | 'READING' | 'WANT_TO_READ';
+
+const statusLabel: Record<BookStatus, string> = {
+  READ: 'READ',
+  READING: 'READING',
+  WANT_TO_READ: 'WANT TO READ',
+};
+
+const statusClass: Record<BookStatus, string> = {
+  READ: 'text-bar-hp',
+  READING: 'text-cyan',
+  WANT_TO_READ: 'text-orange',
+};
+
+const books = [
+  {
+    title: 'Atomic Habits',
+    author: 'James Clear',
+    status: 'READ' as BookStatus,
+    rating: 5,
+    category: 'Self-Development',
+    takeaway: 'Environment design beats willpower when consistency is the goal.',
+  },
+  {
+    title: 'Thinking, Fast and Slow',
+    author: 'Daniel Kahneman',
+    status: 'READ' as BookStatus,
+    rating: 4,
+    category: 'Psychology',
+    takeaway: 'Slow thinking is expensive, but it prevents expensive mistakes.',
+  },
+  {
+    title: 'Meditations',
+    author: 'Marcus Aurelius',
+    status: 'READING' as BookStatus,
+    rating: 4,
+    category: 'Philosophy',
+    takeaway: 'Focus on what you can control, then execute cleanly.',
+  },
+  {
+    title: 'Designing Data-Intensive Applications',
+    author: 'Martin Kleppmann',
+    status: 'READING' as BookStatus,
+    rating: 5,
+    category: 'Tech',
+    takeaway: 'Reliability is mostly about understanding tradeoffs explicitly.',
+  },
+  {
+    title: 'Deep Work',
+    author: 'Cal Newport',
+    status: 'READ' as BookStatus,
+    rating: 4,
+    category: 'Self-Development',
+    takeaway: 'High-value output needs focused blocks, not fragmented multitasking.',
+  },
+  {
+    title: 'Man’s Search for Meaning',
+    author: 'Viktor E. Frankl',
+    status: 'READ' as BookStatus,
+    rating: 5,
+    category: 'Psychology',
+    takeaway: 'Purpose transforms endurance under difficult constraints.',
+  },
+  {
+    title: 'The Pragmatic Programmer',
+    author: 'Andrew Hunt & David Thomas',
+    status: 'READ' as BookStatus,
+    rating: 4,
+    category: 'Tech',
+    takeaway: 'Good engineering is mostly disciplined habits compounded over time.',
+  },
+  {
+    title: 'The Brothers Karamazov',
+    author: 'Fyodor Dostoevsky',
+    status: 'WANT_TO_READ' as BookStatus,
+    category: 'Fiction',
+    takeaway: 'Queued for a slower, reflective read cycle.',
+  },
+];
+
+const stars = (rating?: number) => (rating ? '★'.repeat(rating) + '☆'.repeat(5 - rating) : '—');
+---
+
+<Layout title="Library | Bookshelf">
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#3b2c1f_0%,_#1f1a18_50%,_#100d0c_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto max-w-5xl">
+      <RPGPanel title="Library | Bookshelf">
+        <div class="grid gap-4">
+          {books.map((book) => (
+            <article class="rounded border-2 border-panel-light/70 bg-panel-dark/45 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="font-pixel text-[10px] uppercase tracking-wide text-gold">{book.title}</h3>
+                  <p class="mt-1 text-lg text-parchment/70">by {book.author}</p>
+                </div>
+                <p class:list={['font-pixel text-[10px] uppercase', statusClass[book.status]]}>
+                  {statusLabel[book.status]}
+                </p>
+              </div>
+
+              <p class="mt-3 text-lg text-parchment/80">
+                <span class="text-cyan">Genre:</span> {book.category}
+              </p>
+              <p class="text-lg text-parchment/80">
+                <span class="text-orange">Rating:</span> {stars(book.rating)}
+              </p>
+              <p class="mt-2 text-xl leading-relaxed text-parchment/85">{book.takeaway}</p>
+            </article>
+          ))}
+        </div>
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>

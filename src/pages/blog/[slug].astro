@@ -1,0 +1,69 @@
+---
+export const prerender = true;
+
+import { getCollection, render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import RPGPanel from '../../components/RPGPanel.astro';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.map(post => ({ params: { slug: post.id } }));
+}
+
+const { slug } = Astro.params;
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const post = posts.find((entry) => entry.id === slug);
+
+if (!post) {
+  throw new Error(`Blog post not found: ${slug}`);
+}
+
+const { Content } = await render(post);
+---
+
+<Layout title={`${post.data.title} | Field Notes`}>
+  <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#2a2144_0%,_#171628_45%,_#0c0b14_100%)] px-4 pb-16 pt-24">
+    <section class="mx-auto max-w-3xl">
+      <RPGPanel title={`Field Note | ${post.data.category}`}>
+        <p class="font-pixel text-[10px] uppercase tracking-wide text-parchment/60">
+          {post.data.pubDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+        </p>
+        <h1 class="mt-3 font-pixel text-[12px] uppercase tracking-wide text-gold">{post.data.title}</h1>
+        <p class="mt-3 text-xl leading-relaxed text-parchment/80">{post.data.description}</p>
+
+        <article class="blog-content mt-6 text-xl leading-relaxed text-parchment/90">
+          <Content />
+        </article>
+
+        <a href="/blog" class="mt-8 inline-block text-lg text-cyan/90 hover:text-cyan transition-colors">
+          ← Back to Field Notes
+        </a>
+      </RPGPanel>
+    </section>
+  </main>
+</Layout>
+
+<style>
+  .blog-content :global(h2) {
+    margin-top: 1.6rem;
+    margin-bottom: 0.5rem;
+    font-family: var(--font-pixel), monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-gold);
+  }
+
+  .blog-content :global(p) {
+    margin: 0.75rem 0;
+  }
+
+  .blog-content :global(a) {
+    color: var(--color-cyan);
+  }
+
+  .blog-content :global(ul) {
+    margin: 0.75rem 0;
+    padding-left: 1.2rem;
+  }
+</style>

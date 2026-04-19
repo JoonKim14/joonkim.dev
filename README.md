@@ -1,57 +1,33 @@
-# Joon Kim's Personal Website
+# joonkim.dev
 
-**Welcome to my Planet**
+A retro pixel-art RPG personal website. Visitors experience a game boot sequence, land on an interactive pixel town, and explore by clicking into buildings.
 
-An interactive 3D portfolio website built with Astro, React Three Fiber, and Tailwind CSS.
+**Vibe:** Maplestory × Stardew Valley. Cozy, pixel, witty.
 
-## Tech Stack
-
-- **Framework:** Astro 4.0+ (Islands Architecture)
-- **3D Graphics:** Three.js + React Three Fiber
-- **Styling:** Tailwind CSS
-- **Content:** MDX for blog posts
-- **Language:** TypeScript
-
-## Development
-
-```bash
-# Install dependencies
-npm install
-
-# Start dev server
-npm run dev
-
-# Build for production
-npm run build
-
-# Preview production build
-npm run preview
-```
-
-## Project Structure
+## Concept
 
 ```
-/
-├── public/           # Static assets
-├── src/
-│   ├── components/   # React/Astro components
-│   ├── content/      # MDX blog posts
-│   ├── layouts/      # Page layouts
-│   └── pages/        # Routes
-├── astro.config.mjs  # Astro configuration
-└── tailwind.config.mjs # Tailwind configuration
+Splash Screen → Loading Screen → Main Menu → Pixel Town Hub → Sections
 ```
 
-## Features
+The "town" is a fully interactive pixel scene. Each building is a section of the site (About, Projects, Blog, Skills, Bookshelf, Now, Contact, Achievements).
 
-- 🌍 Interactive 3D globe navigation
-- 🎨 Dark space theme with green sanctuary colors
-- 📝 MDX-powered blog
-- 🚀 Zero JS by default (Islands Architecture)
-- 📱 Mobile-optimized performance
-- ♿ Accessibility-first design
+## Sections
 
-## License
+| Building | Content |
+|----------|---------|
+| Home | Character Sheet — full-person stats |
+| Quest Log | Projects |
+| Field Notes | Blog |
+| Shop | Skills & Stack (inventory rarity system) |
+| Library | Bookshelf |
+| Noticeboard | Now Page — "menu of the day" |
+| Guild Hall | Contact |
+| Hall of Fame | Achievements |
 
-MIT
+## Status
 
+Core scaffolding and all primary routes are implemented on Astro + Tailwind + Cloudflare.
+Content can be expanded over time through `src/content/blog` and `src/content/projects/index.json`.
+
+See [WEBSITE_PLAN.md](./WEBSITE_PLAN.md) for full design spec.
