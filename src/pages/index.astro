@@ -173,7 +173,6 @@ const buildings = [
   const LOADING_DURATION = 2000;
   const TIP_INTERVAL = 1200;
 
-  // ── Stars ──
   function createStars(containerId: string, count: number) {
     const container = document.getElementById(containerId);
     if (!container) return;
@@ -192,93 +191,97 @@ const buildings = [
     }
   }
 
-  createStars('stars', 80);
-  createStars('loading-stars', 80);
-  createStars('menu-stars', 80);
-  createStars('town-stars', 80);
+  let initAbort: AbortController | null = null;
 
-  // ── Screen transitions ──
-  type Screen = 'splash' | 'loading' | 'menu' | 'town';
-  let current: Screen = 'splash';
+  // Clean up home-page listeners before any navigation away
+  document.addEventListener('astro:before-preparation', () => initAbort?.abort());
 
-  function showScreen(id: Screen, instant = false) {
-    const screens = document.querySelectorAll('.screen');
-    if (instant) {
-      screens.forEach((el) => {
-        (el as HTMLElement).style.transition = 'none';
-        el.classList.remove('active');
-      });
-      const target = document.getElementById(id);
-      if (target) {
-        target.style.transition = 'none';
-        target.classList.add('active');
-        void target.offsetHeight;
-        target.style.transition = '';
-      }
-      screens.forEach((el) => {
-        void (el as HTMLElement).offsetHeight;
-        (el as HTMLElement).style.transition = '';
-      });
-    } else {
-      screens.forEach((el) => el.classList.remove('active'));
-      document.getElementById(id)?.classList.add('active');
-    }
-    current = id;
-  }
+  document.addEventListener('astro:page-load', () => {
+    if (!document.getElementById('splash')) return;
 
-  // ── Hash routing (back from section pages) ──
-  const hash = window.location.hash.slice(1) as Screen;
-  if (hash === 'town' || hash === 'menu') {
-    showScreen(hash, true);
-    delete document.documentElement.dataset.skipTo;
-    history.replaceState(null, '', '/');
-  }
+    initAbort?.abort();
+    initAbort = new AbortController();
+    const { signal } = initAbort;
 
-  // ── Splash → Loading ──
-  function startLoading() {
-    if (current !== 'splash') return;
-    showScreen('loading');
+    createStars('stars', 80);
+    createStars('loading-stars', 80);
+    createStars('menu-stars', 80);
+    createStars('town-stars', 80);
 
-    const fill = document.getElementById('progress-fill') as HTMLElement;
-    const tipEl = document.getElementById('loading-tip') as HTMLElement;
-    const start = performance.now();
-    let tipIndex = 0;
+    type Screen = 'splash' | 'loading' | 'menu' | 'town';
+    let current: Screen = 'splash';
 
-    const tipTimer = setInterval(() => {
-      tipIndex = (tipIndex + 1) % LOADING_TIPS.length;
-      tipEl.style.opacity = '0';
-      setTimeout(() => {
-        tipEl.textContent = LOADING_TIPS[tipIndex];
-        tipEl.style.opacity = '1';
-      }, 150);
-    }, TIP_INTERVAL);
-
-    function tick() {
-      const elapsed = performance.now() - start;
-      const progress = Math.min(elapsed / LOADING_DURATION, 1);
-      fill.style.width = `${progress * 100}%`;
-
-      if (progress < 1) {
-        requestAnimationFrame(tick);
+    function showScreen(id: Screen, instant = false) {
+      const screens = document.querySelectorAll('.screen');
+      if (instant) {
+        screens.forEach((el) => {
+          (el as HTMLElement).style.transition = 'none';
+          el.classList.remove('active');
+        });
+        const target = document.getElementById(id);
+        if (target) {
+          target.style.transition = 'none';
+          target.classList.add('active');
+          void target.offsetHeight;
+          target.style.transition = '';
+        }
+        screens.forEach((el) => {
+          void (el as HTMLElement).offsetHeight;
+          (el as HTMLElement).style.transition = '';
+        });
       } else {
-        clearInterval(tipTimer);
-        setTimeout(() => showScreen('menu'), 400);
+        screens.forEach((el) => el.classList.remove('active'));
+        document.getElementById(id)?.classList.add('active');
       }
+      current = id;
     }
 
-    requestAnimationFrame(tick);
-  }
+    // Hash routing (back from section pages via ViewTransitions)
+    const hash = window.location.hash.slice(1) as Screen;
+    if (hash === 'town' || hash === 'menu') {
+      showScreen(hash, true);
+      delete document.documentElement.dataset.skipTo;
+      history.replaceState(null, '', '/');
+    }
 
-  document.addEventListener('keydown', () => startLoading(), { once: true });
-  document.getElementById('splash')?.addEventListener('click', () => startLoading(), { once: true });
+    function startLoading() {
+      if (current !== 'splash') return;
+      const fill = document.getElementById('progress-fill') as HTMLElement | null;
+      const tipEl = document.getElementById('loading-tip') as HTMLElement | null;
+      if (!fill || !tipEl) return;
+      showScreen('loading');
 
-  // ── Menu → Town ──
-  document.getElementById('btn-continue')?.addEventListener('click', () => {
-    showScreen('town');
-  });
+      const start = performance.now();
+      let tipIndex = 0;
 
-  document.getElementById('btn-back-menu')?.addEventListener('click', () => {
-    showScreen('menu');
+      const tipTimer = setInterval(() => {
+        tipIndex = (tipIndex + 1) % LOADING_TIPS.length;
+        tipEl.style.opacity = '0';
+        setTimeout(() => {
+          tipEl.textContent = LOADING_TIPS[tipIndex];
+          tipEl.style.opacity = '1';
+        }, 150);
+      }, TIP_INTERVAL);
+
+      function tick() {
+        const elapsed = performance.now() - start;
+        const progress = Math.min(elapsed / LOADING_DURATION, 1);
+        fill.style.width = `${progress * 100}%`;
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          clearInterval(tipTimer);
+          setTimeout(() => showScreen('menu'), 400);
+        }
+      }
+
+      requestAnimationFrame(tick);
+    }
+
+    document.addEventListener('keydown', () => startLoading(), { signal });
+    document.getElementById('splash')?.addEventListener('click', () => startLoading());
+    document.getElementById('btn-continue')?.addEventListener('click', () => showScreen('town'));
+    document.getElementById('btn-back-menu')?.addEventListener('click', () => showScreen('menu'));
   });
 </script>
 

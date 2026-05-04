@@ -1,5 +1,6 @@
 ---
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 
 interface Props {
   title?: string;
@@ -30,6 +31,7 @@ const isCredits = Astro.url.pathname === '/credits' || Astro.url.pathname === '/
     />
 
     <title>{title}</title>
+    <ClientRouter />
   </head>
   <body>
     {!isHome && (
@@ -43,20 +45,62 @@ const isCredits = Astro.url.pathname === '/credits' || Astro.url.pathname === '/
       </nav>
     )}
     <slot />
-    {!isHome && (
-      <footer class="px-4 pb-8 pt-6 text-center">
-        <p class="font-retro text-base text-parchment/40">
-          Music by Clement Panchout ·
-          <a
-            href="https://www.clementpanchout.com"
-            target="_blank"
-            rel="noreferrer"
-            class="text-gold/80 hover:text-gold transition-colors"
-          >
-            clementpanchout.com
-          </a>
-        </p>
-      </footer>
-    )}
+
+    <audio id="bg-music" loop preload="auto" transition:persist>
+      <source src="/audio/life-is-full-of-joy.mp3" type="audio/mpeg" />
+    </audio>
+
+    <button
+      id="music-toggle"
+      aria-label="Toggle music"
+      transition:persist
+      class="fixed right-4 top-4 z-50 flex h-9 w-9 items-center justify-center rounded border-2 border-panel-light/80 bg-panel/80 text-base text-gold hover:text-parchment transition-colors"
+    >
+      🔊
+    </button>
+
+    <script is:inline>
+      (function () {
+        if (window.__musicInit) return;
+        window.__musicInit = true;
+
+        var audio = document.getElementById('bg-music');
+        var btn = document.getElementById('music-toggle');
+        var muted = localStorage.getItem('musicMuted') === 'true';
+
+        audio.volume = 0.13;
+
+        function updateBtn() {
+          if (btn) btn.textContent = muted ? '🔇' : '🔊';
+        }
+        updateBtn();
+
+        function tryPlay() {
+          if (!muted) audio.play().catch(function () {});
+        }
+
+        function onFirstInteraction() {
+          document.removeEventListener('click', onFirstInteraction);
+          document.removeEventListener('keydown', onFirstInteraction);
+          tryPlay();
+        }
+        document.addEventListener('click', onFirstInteraction);
+        document.addEventListener('keydown', onFirstInteraction);
+
+        if (btn) {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            muted = !muted;
+            localStorage.setItem('musicMuted', String(muted));
+            updateBtn();
+            if (muted) {
+              audio.pause();
+            } else {
+              audio.play().catch(function () {});
+            }
+          });
+        }
+      })();
+    </script>
   </body>
 </html>
