@@ -2,6 +2,14 @@
 import Layout from '../layouts/Layout.astro';
 import RPGPanel from '../components/RPGPanel.astro';
 
+const traits = [
+  { name: 'RELATOR', description: 'Builds few but deeply loyal connections. Authenticity over volume.' },
+  { name: 'ARRANGER', description: 'Finds the optimal configuration when juggling complex, moving parts.' },
+  { name: 'LEARNER', description: 'Energized by the process of acquiring knowledge, not just the destination.' },
+  { name: 'BELIEF', description: 'Decisions anchored in core values, not convenience.' },
+  { name: 'INTELLECTION', description: 'Drawn to deep thinking, reflection, and solitary reasoning.' },
+];
+
 const rarityGroups = [
   {
     rarity: 'LEGENDARY',
@@ -16,26 +24,28 @@ const rarityGroups = [
     rarityClass: 'text-purple',
     items: [
       { name: 'Python', note: 'Automation, data tooling, and service glue.' },
-      { name: 'Go', note: 'Backend services where simplicity and speed matter.' },
+      { name: 'TypeScript', note: 'Typed frontend/backend workflows and API contracts.' },
+      { name: 'C# / .NET', note: 'Production backend services at Geotab.' },
       { name: 'SQL', note: 'Query tuning and schema-aware data modeling.' },
-      { name: 'Backend Architecture', note: 'Designing stable service boundaries and contracts.' },
     ],
   },
   {
     rarity: 'RARE',
     rarityClass: 'text-cyan',
     items: [
-      { name: 'TypeScript', note: 'Typed frontend/backend workflows and API contracts.' },
-      { name: 'React/Astro', note: 'Fast interfaces with pragmatic DX.' },
-      { name: 'DevOps Fundamentals', note: 'CI/CD, observability basics, and deployment hygiene.' },
+      { name: 'React', note: 'Fast interfaces with pragmatic DX.' },
+      { name: 'GCP', note: 'Cloud infra, Cloud Tasks, and service integrations.' },
+      { name: 'Kubernetes / Docker', note: 'Container orchestration and pod-level debugging.' },
+      { name: 'Node.js', note: 'API and service layer in JS/TS stacks.' },
     ],
   },
   {
     rarity: 'UNCOMMON',
     rarityClass: 'text-bar-hp',
     items: [
-      { name: 'Philosophy', note: 'Useful for first-principles framing and tradeoff clarity.' },
-      { name: 'Behavioral Science', note: 'Helps shape habits, UX, and communication patterns.' },
+      { name: 'Terraform', note: 'Infrastructure as code for reproducible cloud environments.' },
+      { name: 'C / C++', note: 'Systems-level work and performance-critical code.' },
+      { name: 'R', note: 'Statistical analysis and data modeling.' },
     ],
   },
   {
@@ -44,7 +54,6 @@ const rarityGroups = [
     items: [
       { name: 'Git', note: 'Clean commit hygiene, debugging, and review flow.' },
       { name: 'Linux', note: 'Comfortable with day-to-day terminal-first workflows.' },
-      { name: 'Communication', note: 'Direct writing and decision framing.' },
     ],
   },
 ];
@@ -52,7 +61,19 @@ const rarityGroups = [
 
 <Layout title="Shop | Skills & Stack">
   <main class="min-h-screen bg-[radial-gradient(circle_at_top,_#23335a_0%,_#1a1a2e_52%,_#0f101c_100%)] px-4 pb-16 pt-24">
-    <section class="mx-auto max-w-5xl">
+    <section class="mx-auto max-w-5xl grid gap-6">
+      <RPGPanel title="Character Traits">
+        <p class="mb-4 text-lg text-parchment/60">Gallup CliftonStrengths — Top 5</p>
+        <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {traits.map((trait) => (
+            <div class="rounded border-2 border-gold/40 bg-panel-dark/55 px-3 py-3">
+              <p class="font-pixel text-[10px] uppercase tracking-wide text-gold">{trait.name}</p>
+              <p class="mt-2 text-lg leading-relaxed text-parchment/80">{trait.description}</p>
+            </div>
+          ))}
+        </div>
+      </RPGPanel>
+
       <RPGPanel title="Shop | Inventory">
         <div class="grid gap-4">
           {rarityGroups.map((group) => (
